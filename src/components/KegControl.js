@@ -2,9 +2,8 @@ import React from 'react';
 import KegList from './KegList';
 import NewKegForm from './NewKegForm';
 import KegDetail from './KegDetail';
-// import amountToRestock from './KegDetail';
 import EditKegForm from './EditKegForm';
-import $ from 'jquery';
+
 
 
 class KegControl extends React.Component {
@@ -77,17 +76,14 @@ class KegControl extends React.Component {
     });
   } 
 
-  handleRestock = () => {
-    const amountToRestock = parseInt($(".pintRestockNum").val());
-    const selectedKeg = this.state.selectedKeg; //selects keg that is currently selected and viewed in details page
-    const newKegPintQuantity = Object.assign({}, selectedKeg, {kegPintQuantity: selectedKeg.kegPintQuantity += amountToRestock}); //this targets the selectedKeg and it's kegPintQuantity, and assigns it the new kegPintQuantity. 
-    // Ex.) If pints equals 0 and I want to restock 20, the new ouput is "020"
-    const newKegList = this.state.masterKegList
-    .filter(keg => keg.id !== this.state.selectedKeg.id)
-    .concat(newKegPintQuantity); //updates the keg list
+  handleRestock = (id, amountToRestock) => { // takes in amountToRestock as argument instead of jquery'd
+    const newMasterKegList = this.state.masterKegList.map((keg) => ({ // loops through list for specific keg
+      ...keg, // uses spread operator to make copy
+        kegPintQuantity: keg.id === id ? parseInt(keg.kegPintQuantity) + parseInt(amountToRestock) : keg.kegPintQuantity // uses ternary operator to determine if id's match, if so run kegPintQuantity reassessment. If not, return og value.
+    }))
     this.setState({
-      masterKegList: newKegList,
-      selectedKeg: newKegPintQuantity
+      masterKegList: newMasterKegList,
+      selectedKeg: null
     });
   } 
 
